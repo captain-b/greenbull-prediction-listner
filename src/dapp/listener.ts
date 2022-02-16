@@ -8,7 +8,7 @@ export const provider = new ethers.providers.JsonRpcProvider(rpc);
 
 const wallet = new Wallet(privateKey).connect(provider);
 
-const predictionsContractAddress: string = process.env.NODE_ENV === 'production' ? process.env.PREDICTIONS_CONTRACT_ADDRESS : process.env.GANACHE_PREDICTIONS_CONTRACT_ADDRESS;
+const predictionsContractAddress: string = process.env.NODE_ENV === 'production' ? process.env.PREDICTIONS_CONTRACT_ADDRESS! : process.env.GANACHE_PREDICTIONS_CONTRACT_ADDRESS!;
 
 enum PredictionsEvents {
     StartRound = 'StartRound'
