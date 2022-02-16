@@ -5,11 +5,10 @@ import axios from "axios";
 const privateKey: string = process.env.NODE_ENV === 'production' ? process.env.TREASURY_PRIVATE_KEY! : process.env.GANACHE_PRIVATE_KEY!;
 const rpc: string = process.env.NODE_ENV === 'production' ? process.env.JSON_RPC_PROVIDER! : process.env.GANACHE_JSON_RPC_PROVIDER!;
 export const provider = new ethers.providers.JsonRpcProvider(rpc);
-console.log(rpc, privateKey, process.env.NODE_ENV)
 
 const wallet = new Wallet(privateKey).connect(provider);
 
-const predictionsContractAddress: string = process.env.PREDICTIONS_CONTRACT_ADDRESS ?? '';
+const predictionsContractAddress: string = process.env.NODE_ENV === 'production' ? process.env.PREDICTIONS_CONTRACT_ADDRESS : process.env.GANACHE_PREDICTIONS_CONTRACT_ADDRESS;
 
 enum PredictionsEvents {
     StartRound = 'StartRound'
