@@ -4,4 +4,6 @@ InitEnvVars();
 
 import {StartBlockchainListener} from "./dapp/listener";
 
-StartBlockchainListener('BTC');
+if (process.env.ENABLED === 'true') {
+    StartBlockchainListener('BTC');
+}
