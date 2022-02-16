@@ -5,7 +5,8 @@
   "scripts": {
     "build": "tsc",
     "start:dev": "NODE_ENV=local-dev ts-node-dev --respawn src/index.ts",
-    "start:prod": "NODE_ENV=production ts-node-dev --respawn src/index.ts"
+    "start:prod": "NODE_ENV=production ts-node-dev --respawn src/index.ts",
+    "start": "NODE_ENV=production node dist/index.js"
   },
   "dependencies": {
     "axios": "^0.23.0",
