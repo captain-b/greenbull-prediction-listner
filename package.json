@@ -1,0 +1,28 @@
+{
+  "name": "crypto-night",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "build": "tsc",
+    "start:dev": "NODE_ENV=local-dev ts-node-dev --respawn src/index.ts",
+    "start:prod": "NODE_ENV=production ts-node-dev --respawn src/index.ts"
+  },
+  "dependencies": {
+    "axios": "^0.23.0",
+    "dotenv": "^8.2.0",
+    "ethers": "^5.4.7",
+    "express": "^4.17.1",
+    "express-handlebars": "^5.3.4",
+    "mongodb": "^3.6.6"
+  },
+  "devDependencies": {
+    "@ethersproject/providers": "^5.4.5",
+    "@shelf/jest-mongodb": "^1.2.3",
+    "@types/express": "^4.17.13",
+    "@types/express-handlebars": "^5.3.1",
+    "@types/mongodb": "^3.6.8",
+    "hardhat": "^2.6.6",
+    "ts-node-dev": "^1.0.0-pre.44",
+    "typescript": "^3.9.9"
+  }
+}

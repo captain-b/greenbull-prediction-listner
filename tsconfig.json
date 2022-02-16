@@ -1,0 +1,20 @@
+{
+    "compilerOptions": {
+        "outDir": "./dist",
+        "allowJs": true,
+        "strict": true,
+        "target": "es2019",
+        "moduleResolution": "node",
+        "esModuleInterop": true,
+        "module": "commonjs",
+        "inlineSourceMap": true,
+        "skipLibCheck": true,
+        "typeRoots": [
+            "node_modules/@types",
+            "./types"
+        ]
+    },
+    "include": [
+        "./src/**/*",
+    ]
+}
