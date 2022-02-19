@@ -14,7 +14,8 @@
     "ethers": "^5.4.7",
     "express": "^4.17.1",
     "express-handlebars": "^5.3.4",
-    "mongodb": "^3.6.6"
+    "mongodb": "^3.6.6",
+    "web3": "^1.7.0"
   },
   "devDependencies": {
     "@ethersproject/providers": "^5.4.5",

@@ -1,18 +1,21 @@
 import {Contract, ethers, Wallet} from "ethers";
 import {PredictionsAbi} from "../utils/abi/predictions";
 import axios from "axios";
+import Web3 from "web3";
 
 const privateKey: string = process.env.NODE_ENV === 'production' ? process.env.TREASURY_PRIVATE_KEY! : process.env.GANACHE_PRIVATE_KEY!;
 const rpc: string = process.env.NODE_ENV === 'production' ? process.env.JSON_RPC_PROVIDER! : process.env.GANACHE_JSON_RPC_PROVIDER!;
 export const provider = new ethers.providers.JsonRpcProvider(rpc);
 
-const wallet = new Wallet(privateKey).connect(provider);
+const wallet = new Wallet(privateKey, provider);
 
 const predictionsContractAddress: string = process.env.NODE_ENV === 'production' ? process.env.PREDICTIONS_CONTRACT_ADDRESS! : process.env.GANACHE_PREDICTIONS_CONTRACT_ADDRESS!;
 
 enum PredictionsEvents {
     StartRound = 'StartRound'
 }
+
+const web3: Web3 = new Web3(new Web3.providers.HttpProvider(rpc));
 
 export const StartBlockchainListener = async (token: Token) => {
     const PredictionsContract = new ethers.Contract(predictionsContractAddress, PredictionsAbi, provider);
@@ -23,11 +26,12 @@ export const StartBlockchainListener = async (token: Token) => {
 
     PredictionsContract.on(PredictionsEvents.StartRound, async (round: BigInt, price: BigInt, lockTimestamp: BigInt, closeTimestamp: BigInt) => {
         const now = Math.round((new Date()).getTime() / 1000);
+
         const timestamp = new Date(Number(lockTimestamp)).getTime();
 
         setTimeout(async () => {
             await lockRound(PredictionsContract, token);
-        }, ((timestamp - now) * 1000) + 2000);
+        }, ((timestamp - now) * 1000) + 5000);
     });
     console.log('Listening')
 }
@@ -41,19 +45,56 @@ const determineNextRound = async (contract: Contract, token: Token, lockTimestam
         return;
     }
 
+    const timeDifference = ((timestamp - now) * 1000) + 5000;
+
     setTimeout(async () => {
         await lockRound(contract, token);
-    }, ((timestamp - now) * 1000) + 2000);
+    }, timeDifference);
 }
 
 const lockRound = async (contract: Contract, token: Token) => {
     const {price} = await getPairPrice(token);
     const bigPrice = price.split('.')[0] + price.split('.')[1];
     try {
-        const tx = await contract.connect(wallet).lockRound(bigPrice.toString());
-        await tx.wait();
+        const PredictionsContractWeb3 = new web3.eth.Contract(PredictionsAbi as any, predictionsContractAddress);
+        const tx = PredictionsContractWeb3.methods.lockRound(bigPrice.toString());
+        const gasPrice: string = await web3.eth.getGasPrice();
+        const nonce = await web3.eth.getTransactionCount(wallet.address);
+        let gas: BigInt;
+
+        try {
+            gas = await tx.estimateGas({from: wallet.address});
+        } catch (e) {
+            console.log(e);
+            return;
+        }
+
+        const data = tx.encodeABI();
+
+        const transactionConfig = {
+            chainId: 137,
+            to: predictionsContractAddress,
+            gasPrice,
+            nonce,
+            gas: (BigInt(gas.toString()) * BigInt(3)).toString(),
+            data
+        };
+
+        try {
+            const signedTx = await web3.eth.accounts.signTransaction(transactionConfig, privateKey);
+
+            const result = await web3.eth.sendSignedTransaction(signedTx.rawTransaction!);
+
+            console.log(`${new Date().getDate()} ${new Date().getTime()}`,result.transactionHash)
+        } catch(e) {
+            console.log("Failed to send transaction.");
+            throw e;
+        }
+        return;
     } catch (e) {
-        console.log(e.reason);
+        console.log('error')
+        console.log(e);
+        throw e;
     }
 }
 
